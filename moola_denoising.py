@@ -3,7 +3,7 @@ import numpy as np
 from dolfin import *
 from dolfin_adjoint import *
 import moola
-np.seed(1)
+np.random.seed(1)
 
 ### This first part is a hacky way of importing an image to FEniCS.
 N = 219
