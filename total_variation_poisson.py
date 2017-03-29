@@ -8,8 +8,7 @@ np.random.seed(1)
 set_log_level(ERROR)
 
 
-
-
+### first we set up the system:
 R_ves = 6
 p_ves = 80.
 #C = 1.14e-3
@@ -36,7 +35,7 @@ bcs = [bc1, bc2]
 
 
 
-
+### Solve the noiseless system to find the true p
 C = 3.54e-4
 p = Function(V)
 # M = Function(V)
@@ -44,25 +43,28 @@ M = Constant(C)
 v = TestFunction(V)
 form = (inner(nabla_grad(p), nabla_grad(v)) + M*v )*dx
 solve(form==0, p, bcs)
-
 p_solution = p.copy(deepcopy=True)
+
+
+### Create noisy system
 noise = 5*np.random.randn(np.size(p.vector().array()))
 p_noisy = p.copy(deepcopy=True)
 p_noisy.vector()[:] = p.vector().array() + noise
 
 e1 = errornorm(p,p_noisy)
 
-# p_noisy = Function(V)
+
+# Solve forward problem (needed for moola)
 p = Function(V, name='State')
 M = Function(W, name='Control')
 form = (inner(nabla_grad(p), nabla_grad(v)) + M*v )*dx
 solve(form==0, p, bcs)
 
+
+### Set up the functional:
 l = 1
 eps = 1e-8
-
 control = Control(M)
-
 def func(p, M, l, eps):
     return (0.5*inner(p_noisy-p,p_noisy-p) + l*sqrt(inner(nabla_grad(M), nabla_grad(M))+eps))*dx
 
@@ -76,26 +78,27 @@ solver = moola.BFGS(problem, M_moola, options={'jtol': 0,
                                                'Hinit': "default",
                                                'maxiter': 100,
                                                'mem_lim': 10})
+### Solve
 sol = solver.solve()
 
 
-M_opt = sol['control'].data
-# me2 = errornorm(M, M_opt)
-# M_noisy.assign(M_opt)
 
+### Check solution
+M_opt = sol['control'].data
 p_opt = Function(V)
 form_opt = (inner(nabla_grad(p_opt), nabla_grad(v)) + M_opt*v )*dx
 solve(form_opt==0, p_opt,bcs)
 
 file1 = File("p_opt.pvd")
 file1 << p_opt
-
 e2 = errornorm(p_opt, p_solution)
 
 
 print "Error in noisy signal: ", e1
 print "Error in restored signal: ", e2
 
+
+### Save solutions
 file1 = File("p_noisy.pvd")
 file1 << p_noisy
 file2 = File("p_exact.pvd")
