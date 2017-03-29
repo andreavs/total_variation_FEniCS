@@ -39,7 +39,6 @@ f.assign(u_true - u_noisy)
 # f.vector()[:] = 1.0
 epsilon = 1e-8
 form = (u - u_noisy - f)*v*dx
-a,L = system(form)
 bc = DirichletBC(V, 0.0, "on_boundary")
 solve(form==0, u, bc)
 u_sol1 = u.copy(deepcopy=True)
