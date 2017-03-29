@@ -86,10 +86,10 @@ def tv(u,l,epsilon):
 # print assemble(tv(u_noisy,l,epsilon)*dx)
 
 
-print "Functional of original signal: ", assemble(func(u_true,l,epsilon,f)*dx)
-print "Functional of noisy signal: ",assemble(func(u_noisy,l,epsilon,f)*dx)
-print "Functional of optimal signal: ", assemble(func(u,l,epsilon,f)*dx)
-print "Functional of initial guess signal: ", assemble(func(u_sol1,l,epsilon,f)*dx)
+print "Functional of original signal: ", assemble(func(u_true,l,epsilon,f))
+print "Functional of noisy signal: ",assemble(func(u_noisy,l,epsilon,f))
+print "Functional of optimal signal: ", assemble(func(u,l,epsilon,f))
+print "Functional of initial guess signal: ", assemble(func(u_sol1,l,epsilon,f))
 
 # file1 = File("u_opt.pvd")
 # file1 << u
